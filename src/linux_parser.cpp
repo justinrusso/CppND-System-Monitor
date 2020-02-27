@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <math.h>
 #include <unistd.h>
 #include <string>
 #include <vector>
@@ -69,8 +70,16 @@ vector<int> LinuxParser::Pids() {
 // TODO: Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { return 0.0; }
 
-// TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() {
+  double uptime = 0;
+  FILE* file = fopen(&(kProcDirectory + kUptimeFilename)[0], "r");
+  if (file) {
+    int n = fscanf(file, "%64lf", &uptime);
+    fclose(file);
+    if (n <= 0) { return 0; } // Didnt find a match
+  }
+  return (long) floor(uptime);
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
